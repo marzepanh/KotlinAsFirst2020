@@ -73,9 +73,9 @@ fun ageDescription(age: Int): String {
     val unit = age % 10
     return when {
         age % 100 in 11..14 -> "$age лет"
-        unit == 1     -> "$age год"
-        unit in 2..4  -> "$age года"
-        else          -> "$age лет"
+        unit == 1 -> "$age год"
+        unit in 2..4 -> "$age года"
+        else -> "$age лет"
     }
 }
 
@@ -115,16 +115,14 @@ fun whichRookThreatens(
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
 ): Int {
-    var rook1 = false
-    var rook2 = false
+    val rook1 = kingX == rookX1 || kingY == rookY1
+    val rook2 = kingX == rookX2 || kingY == rookY2
 
-    if (kingX == rookX1 || kingY == rookY1) rook1 = !rook1
-    if (kingX == rookX2 || kingY == rookY2) rook2 = !rook2
     return when {
         rook1 && rook2 -> 3
         rook1 -> 1
         rook2 -> 2
-        else  -> 0
+        else -> 0
     }
 }
 
@@ -143,17 +141,15 @@ fun rookOrBishopThreatens(
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
 ): Int {
-    var bishop = false
-    var rook = false
+    val rook = kingX == rookX || kingY == rookY
+    val bishop = (kingX + kingY) == (bishopX + bishopY) ||
+            abs(kingX - bishopX) == abs(kingY - bishopY)
 
-    if (kingX == rookX || kingY == rookY) rook = !rook
-    if ((kingX + kingY) == (bishopX + bishopY) ||
-        abs(kingX - bishopX) == abs(kingY - bishopY)) bishop = !bishop
     return when {
         bishop && rook -> 3
-        bishop         -> 2
-        rook           -> 1
-        else           -> 0
+        bishop -> 2
+        rook -> 1
+        else -> 0
     }
 }
 /**
@@ -172,10 +168,10 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
 
     return if ((a + b > c) && (a + c > b) && (b + c > a)) {
         when {
-            (angleA < PI / 2) && (angleB < PI / 2) && (angleC < PI / 2)    -> 0
+            (angleA < PI / 2) && (angleB < PI / 2) && (angleC < PI / 2) -> 0
             (angleA == PI / 2) || (angleB == PI / 2) || (angleC == PI / 2) -> 1
-            (angleA > PI / 2) || (angleB > PI / 2) || (angleC > PI / 2)    -> 2
-            else                                                           -> 42
+            (angleA > PI / 2) || (angleB > PI / 2) || (angleC > PI / 2) -> 2
+            else -> 42
         }
     } else -1
 }
@@ -191,9 +187,9 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     return when {
         c in a..b && d !in a..b -> b - c
-        c in a..b && d in a..b  -> d - c
-        c < a && d in a..b      -> d - a
-        c < a && d > b          -> b - a
-        else                    -> -1
+        c in a..b && d in a..b -> d - c
+        c < a && d in a..b -> d - a
+        c < a && d > b -> b - a
+        else -> -1
     }
 }
