@@ -72,8 +72,7 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
 fun ageDescription(age: Int): String {
     val unit = age % 10
     return when {
-        age in 11..14 -> "$age лет"
-        age == 111    -> "$age лет"
+        age % 100 in 11..14 -> "$age лет"
         unit == 1     -> "$age год"
         unit in 2..4  -> "$age года"
         else          -> "$age лет"
@@ -149,7 +148,7 @@ fun rookOrBishopThreatens(
 
     if (kingX == rookX || kingY == rookY) rook = !rook
     if ((kingX + kingY) == (bishopX + bishopY) ||
-        abs(kingX - kingY) == abs(bishopX - bishopY)) bishop = !bishop
+        abs(kingX - bishopX) == abs(kingY - bishopY)) bishop = !bishop
     return when {
         bishop && rook -> 3
         bishop         -> 2
