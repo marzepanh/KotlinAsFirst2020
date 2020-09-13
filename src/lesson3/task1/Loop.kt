@@ -84,9 +84,7 @@ fun digitNumber(n: Int): Int {
     } while (number > 0)
     return count
 }
-fun main(args: Array<String>) {
-    println(digitNumber(-15))
-}
+
 /**
  * Простая (2 балла)
  *
@@ -167,8 +165,9 @@ fun isCoPrime(m: Int, n: Int): Boolean {
     val minimum = min(m, n)
     val maximum = max(m, n)
     var k = 2
+
     if (m == 1 && n == 1) return true
-    if (maximum % minimum == 0) return false
+    if (maximum % minimum == 0 && minimum != 1) return false
     while (k < minimum / 2) {
         if (minimum % k == 0 && maximum % k == 0) return false
         k += 1
@@ -176,6 +175,9 @@ fun isCoPrime(m: Int, n: Int): Boolean {
     return true
 }
 
+fun main(args: Array<String>) {
+    println(isCoPrime(2, 1))
+}
 /**
  * Средняя (3 балла)
  *
