@@ -221,6 +221,8 @@ fun factorize(n: Int): List<Int> {
             x /= divisor
         }
     }
+
+    if (x != 1) list.add(x)
     return list
 }
 
