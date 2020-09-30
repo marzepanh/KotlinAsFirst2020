@@ -316,8 +316,6 @@ fun extractRepeat(list: List<String>): Map<String, Int> {
     return result
 }
 
-
-
 /**
  * Средняя (3 балла)
  *

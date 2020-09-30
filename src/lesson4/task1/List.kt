@@ -3,9 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import kotlin.math.pow
 import kotlin.math.sqrt
-import lesson3.task1.minDivisor
 
 // Урок 4: списки
 // Максимальное количество баллов = 12
@@ -175,9 +173,12 @@ fun times(a: List<Int>, b: List<Int>): Int {
  */
 fun polynom(p: List<Int>, x: Int): Int {
     var result = 0
+    var xn = 1
 
-    for (i in p.indices) {
-        result += p[i] * x.toDouble().pow(i).toInt()
+    for (factor in p) {
+        result += factor * xn
+
+        xn *= x
     }
     return result
 }
@@ -193,11 +194,10 @@ fun polynom(p: List<Int>, x: Int): Int {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
-    var untilX = 0
-    for (i in 0 until list.size) {
-        untilX += list[i]
-        list[i] = untilX
-    }
+
+    for (i in 1 until list.size)
+        list[i] += list[i - 1]
+
     return list
 }
 
@@ -212,14 +212,17 @@ fun factorize(n: Int): List<Int> {
     val list = mutableListOf<Int>()
     var x = n
 
-    while (x != 1) {
-        val minDiv = minDivisor(x)
-        list.add(minDiv)
-        x /= minDiv
-    }
-    return list.sorted()
-}
+    for (divisor in 2..x / 2 + 1) {
+        if (divisor > x) return list
 
+        while (x % divisor == 0) {
+            list.add(divisor)
+
+            x /= divisor
+        }
+    }
+    return list
+}
 
 /**
  * Сложная (4 балла)
@@ -239,11 +242,10 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  */
 fun convert(n: Int, base: Int): List<Int> {
     var number = n
-    var numeral: Int
     val result = mutableListOf<Int>()
 
-    while (number > base) {
-        numeral = number % base
+    while (number >= base) {
+        val numeral = number % base
         result.add(0, numeral)
 
         number /= base
@@ -266,11 +268,12 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     val list = convert(n, base)
-    val alphabet = "abcdefghijklmnopqrstuvwxyz"
     var result = ""
 
-    for (i in list.indices)
-        result += if (list[i] > 9) alphabet[list[i] - 10] else list[i].toString()
+    for (char in list)
+    //ASCII value of a is: 97
+    //can replace with 'a'.toInt()
+        result += if (char > 9) (97 + char - 10).toChar() else char.toString()
 
     return result
 }
@@ -284,10 +287,13 @@ fun convertToString(n: Int, base: Int): String {
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     var result = 0
+    var baseFactor = 1
 
-    for (i in digits.size - 1 downTo 0)
-        result += digits[i] * (base.toDouble().pow(digits.size - 1 - i)).toInt()
+    for (i in digits.size - 1 downTo 0) {
+        result += digits[i] * baseFactor
 
+        baseFactor *= base
+    }
     return result
 }
 
@@ -304,19 +310,17 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    val digits = "0123456789"
-    val alphabet = "abcdefghijklmnopqrstuvwxyz"
+    //val alphabet = "abcdefghijklmnopqrstuvwxyz"
     val result = mutableListOf<Int>()
 
-    for (i in str.indices) {
-        val digit = if (str[i] in digits) str[i].toString().toInt() else 10 + alphabet.indexOf(str[i])
+    for (char in str) {
+        val digit = if (char in '0'..'9') char.toString().toInt()
+        else 10 + char.toInt() - 97
+
         result.add(digit)
     }
     return decimal(result, base)
 }
-
-
-
 
 /**
  * Сложная (5 баллов)
@@ -329,17 +333,18 @@ fun decimalFromString(str: String, base: Int): Int {
 fun roman(n: Int): String {
     var result = ""
     var x = n
-    val digitsRoman = listOf<String>(
+    val digitsRoman = listOf(
         "M", "CM", "D", "CD", "C", "XC", "L", "XL",
         "X", "IX", "V", "IV", "I"
     )
-    val digits = listOf<Int>(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    val digits = listOf(1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
 
     for (i in digits.indices) {
         if (x >= digits[i]) {
-            for (j in 0 until x / digits[i]) result += digitsRoman[i]
+            val k = x / digits[i]
+            result += digitsRoman[i].repeat(k)
 
-            x %= digits[i]
+            x %= digits[i] * k
         }
     }
     return result
