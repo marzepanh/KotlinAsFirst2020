@@ -273,9 +273,7 @@ fun convertToString(n: Int, base: Int): String {
     var result = ""
 
     for (char in list)
-    //ASCII value of a is: 97
-    //can replace with 'a'.toInt()
-        result += if (char > 9) (97 + char - 10).toChar() else char.toString()
+        result += if (char > 9) 'a' + char - 10 else char.toString()
 
     return result
 }
@@ -312,7 +310,6 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    //val alphabet = "abcdefghijklmnopqrstuvwxyz"
     val result = mutableListOf<Int>()
 
     for (char in str) {
