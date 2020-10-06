@@ -259,7 +259,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     val string = word.toLowerCase().toSet()
     val char = chars.map { it.toLowerCase() }
 
-    return string == char.toSet()
+    return char.toSet().intersect(string) == string
 }
 
 /**
