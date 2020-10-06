@@ -102,7 +102,7 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     for ((name, grade) in grades) {
         if (grade !in result) result[grade] = mutableListOf()
 
-        result[grade]!!.add(name)
+        result[grade]?.add(name)
     }
     return result
 }
@@ -155,6 +155,7 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): MutableMa
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> =
     a.toSet().intersect(b.toSet()).toList()
 
+
 /**
  * Средняя (3 балла)
  *
@@ -179,7 +180,7 @@ fun addToList(
 
     for ((name, phone) in mapA) {
         if (name !in result) result[name] = mutableListOf()
-        if (!result[name]!!.contains(phone)) result[name]!!.add(phone)
+        if (!result[name]!!.contains(phone)) result[name]?.add(phone)
 
     }
     return result
@@ -207,7 +208,7 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
 
     for ((stock, price) in stockPrices) {
         if (stock !in collector) collector[stock] = mutableListOf()
-        collector[stock]!!.add(price)
+        collector[stock]?.add(price)
     }
 
     return collector.mapValues { it.value.sum() / it.value.size }
