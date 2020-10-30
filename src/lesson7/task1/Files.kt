@@ -573,9 +573,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 }
 
-fun main() {
-    print(49.toChar())
-}
 
 /**
  * Сложная (25 баллов)
@@ -601,12 +598,12 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val result = lhv / rhv
     val rDigits = result.toString().toList().map { it.toString().toInt() }
     val lDigits = lhv.toString().toList().map { it.toString() }
-    val len = len(lhv) + 1
+    val lhvLength = len(lhv) + 1
 
     File(outputName).bufferedWriter().use {
         it.write(" $lhv | $rhv\n")
 
-        var k = 0
+        var flag = 0
         var l = len(rhv * rDigits[0]) - 1
         var nextNum = lhv.toString().windowed(l + 1)[0]
 
@@ -614,22 +611,22 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             val num = rhv * digit
             l += 1
 
-            if (k == 0) {
-                k = 1
-                it.write("-" + num + " ".repeat(len + 2 - len(num)) + result + "\n")
+            if (flag == 0) {
+                flag = 1
+                it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + result + "\n")
                 it.write("-".repeat(len(num) + 1) + "\n")
 
                 if (num == 0) {
-                    it.write(" ".repeat(len - len(lhv % rhv)) + lhv % rhv + "\n")
+                    it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
                 } else nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
+
             } else {
                 it.write(" ".repeat(l + 1 - nextNum.length) + nextNum + "\n")
                 it.write(" ".repeat(l - len(num)) + "-" + num + "\n")
                 it.write(" ".repeat(l - len(num)) + "-".repeat(len(num) + 1) + "\n")
                 if (l < len(lhv)) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
-                else it.write(" ".repeat(len - len(lhv % rhv)) + lhv % rhv + "\n")
+                else it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
             }
-
         }
     }
 }
