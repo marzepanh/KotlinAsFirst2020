@@ -41,6 +41,8 @@ class Tests {
         assertEquals("03.04.2011", dateStrToDigit("3 апреля 2011"))
         assertEquals("", dateStrToDigit("32 сентября 2011"))
         assertEquals("", dateStrToDigit("29 февраля 1993"))
+        assertEquals("", dateStrToDigit("ай ай ай"))
+        assertEquals("", dateStrToDigit(""))
     }
 
     @Test
@@ -66,6 +68,7 @@ class Tests {
         assertEquals("+42566789", flattenPhoneNumber("+42(56 -- 67)89"))
         assertEquals("", flattenPhoneNumber("ab-123"))
         assertEquals("", flattenPhoneNumber("134_+874"))
+        assertEquals("", flattenPhoneNumber("134+874"))
     }
 
     @Test
@@ -75,15 +78,19 @@ class Tests {
         assertEquals(-1, bestLongJump("% - - % -"))
         assertEquals(754, bestLongJump("700 717 707 % 754"))
         assertEquals(-1, bestLongJump("700 + 700"))
+        assertEquals(-1, bestLongJump("25ab +   29 b  - 1"))
+        assertEquals(-1, bestLongJump(""))
+        assertEquals(-1, bestLongJump("706+ % 712 - 703"))
 
     }
 
     @Test
     @Tag("6")
     fun bestHighJump() {
-        assertEquals(226, bestHighJump("226 +"))
+        assertEquals(226, bestHighJump("226 + 222 %-+ 22"))
         assertEquals(-1, bestHighJump("???"))
         assertEquals(230, bestHighJump("220 + 224 %+ 228 %- 230 + 232 %%- 234 %"))
+        assertEquals(-1, bestHighJump("ab"))
     }
 
     @Test
