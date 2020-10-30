@@ -128,7 +128,9 @@ Basic, Ruby, Swift.
         Вывести его в выходной файл с именем outputName, выровняв по центру."""
         )
         File("temp.txt").delete()
-
+        centerFile("input/tatata.txt", "temp.txt")
+        assertFileContent("temp.txt", "TA")
+        File("temp.txt").delete()
     }
 
     @Test
@@ -387,6 +389,7 @@ Basic, Ruby, Swift.
             assertFileContent("temp.txt", res.trimIndent())
             File("temp.txt").delete()
         }
+        test(1, 1, " 1 | 1\n-1   1\n--\n 0")
 
         test(
             19935,
@@ -438,6 +441,7 @@ Basic, Ruby, Swift.
                   0
              """
         )
+
 
         File("temp.txt").delete()
     }

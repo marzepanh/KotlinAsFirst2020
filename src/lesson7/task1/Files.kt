@@ -154,7 +154,7 @@ fun sibilants(inputName: String, outputName: String) {
 fun centerFile(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val readFile = File(inputName).bufferedReader().readLines()
-        val l = readFile.map { x: String -> x.length }.maxOrNull() ?: 0
+        val l = readFile.map { x: String -> x.trim().length }.maxOrNull() ?: 0
 
         for (string in readFile) {
             val str = string.trim()
@@ -395,6 +395,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             val line = l.replace(" **", "<b>").replace("**", "</b>")
                 .replace(" *", "<i>").replace("*", "</i>")
                 .replace(" ~~", "<s>").replace("~~", "</s>")
+            //replace with Regex expression
 
             if (line != "") {
                 block += line
@@ -616,18 +617,24 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + result + "\n")
                 it.write("-".repeat(len(num) + 1) + "\n")
 
-                if (num == 0) {
+
+                if (lDigits.size > 1) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
+                else if (lDigits.size == 1)
                     it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
-                } else nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
 
             } else {
                 it.write(" ".repeat(l + 1 - nextNum.length) + nextNum + "\n")
                 it.write(" ".repeat(l - len(num)) + "-" + num + "\n")
                 it.write(" ".repeat(l - len(num)) + "-".repeat(len(num) + 1) + "\n")
+
                 if (l < len(lhv)) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
                 else it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
             }
         }
     }
+}
+
+fun main() {
+    println(" ".repeat(2 - 5 % 5) + 5 % 5)
 }
 

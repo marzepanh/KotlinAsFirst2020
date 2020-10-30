@@ -67,7 +67,7 @@ fun dateStrToDigit(str: String): String {
         "января", "февраля", "марта", "апреля", "мая", "июня", "июля",
         "августа", "сентября", "октября", "ноября", "декабря"
     )
-    val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30)
+    val days = mutableListOf(31, 28, 30, 31, 30, 31, 30, 31, 30, 31, 30, 31)
     return try {
         if (date.size == 3) {
             if (months.indexOf(date[1]) == -1) return ""
@@ -105,7 +105,7 @@ fun dateDigitToStr(digital: String): String {
         "января", "февраля", "марта", "апреля", "мая", "июня", "июля",
         "августа", "сентября", "октября", "ноября", "декабря"
     )
-    val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30)
+    val days = mutableListOf(31, 28, 30, 31, 30, 31, 30, 31, 30, 31, 30, 31)
     return try {
         if (date.size == 3 && date[1].toInt() <= 12 && date[1].toInt() > 0) {
 
@@ -142,8 +142,8 @@ fun dateDigitToStr(digital: String): String {
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
 
-fun flattenPhoneNumber(phone: String): String = if (!phone.contains(Regex("""[^+-\\(\\)\s0-9]|\(\s*\)|\d\++""")))
-    phone.replace("""\s+|-|\(|\)""".toRegex(), "") else ""
+fun flattenPhoneNumber(phone: String): String = if (phone.contains(Regex("""[^+-\\(\\)\s0-9]|\(\s*\)|\d\++""")))
+    "" else phone.replace("""\s+|-|\(|\)""".toRegex(), "")
 
 /**
  * Средняя (5 баллов)
@@ -245,7 +245,7 @@ fun mostExpensive(description: String): String {
                 result = goods[0]
             }
         }
-        result
+        if (max == 0.0) "Any good with price 0.0" else result
     } else ""
 }
 
