@@ -2,9 +2,7 @@
 
 package lesson7.task1
 
-import lesson6.task1.flattenPhoneNumber
 import java.io.File
-import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -600,8 +598,7 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    val result = lhv / rhv
-    val rDigits = result.toString().toList().map { it.toString().toInt() }
+    val resultDigits = (lhv / rhv).toString().toList().map { it.toString().toInt() }
     val lDigits = lhv.toString().toList().map { it.toString() }
     val lhvLength = len(lhv) + 1
 
@@ -609,21 +606,21 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         it.write(" $lhv | $rhv\n")
 
         var flag = 0
-        var l = len(rhv * rDigits[0]) - 1
+        var l = len(rhv * resultDigits[0]) - 1
         var nextNum = lhv.toString().windowed(l + 1)[0]
 
-        for (digit in rDigits) {
+        for (digit in resultDigits) {
             val num = rhv * digit
             l += 1
 
             if (flag == 0) {
                 flag = 1
-                it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + result + "\n")
+                it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + lhv / rhv + "\n")
                 it.write("-".repeat(len(num) + 1) + "\n")
 
 
-                if (lDigits.size > 1) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
-                else if (lDigits.size == 1)
+                if (resultDigits.size > 1) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
+                else if (resultDigits.size == 1)
                     it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
 
             } else {
