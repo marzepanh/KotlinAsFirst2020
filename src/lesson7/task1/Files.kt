@@ -2,7 +2,9 @@
 
 package lesson7.task1
 
+import lesson6.task1.flattenPhoneNumber
 import java.io.File
+import kotlin.math.max
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -303,7 +305,9 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
 
             if (ch != -1) {
                 if (symbol != null) {
-                    if (char.isUpperCase()) it.write(caseSwitch(symbol)) else it.write(symbol.toLowerCase())
+                    if (char.isUpperCase() && symbol != "") it.write(caseSwitch(symbol))
+                    else
+                        it.write(symbol.toLowerCase())
                 } else it.write(ch)
             } else break
 
@@ -625,7 +629,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             } else {
                 it.write(" ".repeat(l + 1 - nextNum.length) + nextNum + "\n")
                 it.write(" ".repeat(l - len(num)) + "-" + num + "\n")
-                it.write(" ".repeat(l - len(num)) + "-".repeat(len(num) + 1) + "\n")
+
+                if (len(num) == nextNum.length)
+                    it.write(" ".repeat(l - len(num)) + "-".repeat(len(num) + 1) + "\n")
+                else
+                    it.write(" ".repeat(l + 1 - nextNum.length) + "-".repeat(nextNum.length) + "\n")
 
                 if (l < len(lhv)) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
                 else it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
@@ -634,7 +642,4 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 }
 
-fun main() {
-    println(" ".repeat(2 - 5 % 5) + 5 % 5)
-}
 

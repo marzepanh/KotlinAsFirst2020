@@ -209,6 +209,14 @@ Basic, Ruby, Swift.
     @Tag("14")
     fun transliterate() {
         transliterate(
+            "input/g.txt",
+            mapOf('G' to ""),
+            "temp.txt"
+        )
+        assertFileContent("temp.txt", "")
+        File("temp.txt").delete()
+
+        transliterate(
             "input/trans_in1.txt",
             mapOf('з' to "zz", 'р' to "r", 'д' to "d", 'й' to "y", 'М' to "m", 'и' to "yy", '!' to "!!!"),
             "temp.txt"
@@ -390,7 +398,7 @@ Basic, Ruby, Swift.
             File("temp.txt").delete()
         }
         test(1, 1, " 1 | 1\n-1   1\n--\n 0")
-
+        test(396002, 36273, " 396002 | 36273\n-36273    10\n------\n  33272\n     -0\n  -----\n  33272")
         test(
             19935,
             22,
