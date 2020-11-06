@@ -2,7 +2,6 @@
 
 package lesson6.task1
 
-import java.lang.NumberFormatException
 
 // Урок 6: разбор строк, исключения
 // Максимальное количество баллов = 13
@@ -63,30 +62,23 @@ fun timeSecondsToStr(seconds: Int): String {
  */
 fun dateStrToDigit(str: String): String {
     val date = str.split(" ")
-    val months = listOf(
-        "января", "февраля", "марта", "апреля", "мая", "июня", "июля",
-        "августа", "сентября", "октября", "ноября", "декабря"
+    val months = mapOf(
+        "января" to 1, "февраля" to 2, "марта" to 3, "апреля" to 4, "мая" to 5, "июня" to 6, "июля" to 7,
+        "августа" to 8, "сентября" to 9, "октября" to 10, "ноября" to 11, "декабря" to 12
     )
     val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-    return try {
-        if (date.size == 3) {
-            if (months.indexOf(date[1]) == -1) return ""
 
-            val day = date[0].toInt()
-            val month = months.indexOf(date[1]) + 1
-            val year = date[2].toInt()
+    val day = date[0].toIntOrNull()
+    val month = months[date[1]]
+    val year = date[2].toIntOrNull()
+    if (day == null || year == null || month == null || date.size != 3) return ""
 
-            if (year % 4 == 0) {
-                if (year % 100 != 0) days[1] += 1
-                else if (year % 400 == 0) days[1] += 1
-            }
-
-            if (day <= days[month - 1]) String.format("%02d.%02d.%d", day, month, year) else ""
-
-        } else return ""
-    } catch (e: NumberFormatException) {
-        return ""
+    if (year % 4 == 0) {
+        if (year % 100 != 0) days[1] += 1
+        else if (year % 400 == 0) days[1] += 1
     }
+
+    return if (day <= days[month - 1]) String.format("%02d.%02d.%d", day, month, year) else ""
 }
 
 /**
@@ -106,24 +98,21 @@ fun dateDigitToStr(digital: String): String {
         "августа", "сентября", "октября", "ноября", "декабря"
     )
     val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-    return try {
-        if (date.size == 3 && date[1].toInt() <= 12 && date[1].toInt() > 0) {
 
-            val day = date[0].toInt()
-            val month = months[date[1].toInt() - 1]
-            val year = date[2].toInt()
+    val num = date[1].toIntOrNull()
+    if (date.size != 3 || num !in 1..12) return ""
 
-            if (year % 4 == 0) {
-                if (year % 100 != 0) days[1] += 1
-                else if (year % 400 == 0) days[1] += 1
-            }
+    val day = date[0].toIntOrNull()
+    val month = months[num!! - 1]
+    val year = date[2].toIntOrNull()
+    if (day == null || year == null) return ""
 
-            if (day <= days[date[1].toInt() - 1]) "$day $month $year" else ""
-
-        } else return ""
-    } catch (e: NumberFormatException) {
-        return ""
+    if (year % 4 == 0) {
+        if (year % 100 != 0) days[1] += 1
+        else if (year % 400 == 0) days[1] += 1
     }
+
+    return if (day <= days[num - 1]) "$day $month $year" else ""
 }
 
 
@@ -157,14 +146,10 @@ fun flattenPhoneNumber(phone: String): String = if (phone.contains(Regex("""[^-+
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 
-fun bestLongJump(jumps: String): Int {
-    return try {
-        val result = jumps.split(" ", "-", "%").filter { it != "" }.map { it.toInt() }
-        result.maxOrNull() ?: -1
-    } catch (e: NumberFormatException) {
-        -1
-    }
-}
+fun bestLongJump(jumps: String): Int = jumps.split(" ", "-", "%").filter { it != "" }.map {
+    if (it.toIntOrNull() == null) return -1 else it.toInt()
+}.maxOrNull() ?: -1
+
 
 /**
  * Сложная (6 баллов)
@@ -196,17 +181,18 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    if (expression.matches(Regex("""^\d+(?:\s[+-]\s\d+)*"""))) {
-        val plus = Regex("""\+\s\d+""").findAll(expression).map {
-            it.groupValues[0].replace("+ ", "").toInt()
-        }
-        val minus = Regex("""-\s\d+""").findAll(expression).map {
-            it.groupValues[0].replace("- ", "").toInt() * -1
-        }
-        val firstNum = Regex("""^\d+""").find(expression)!!.value.toInt()
+    if (!expression.matches(Regex("""^\d+(?:\s[+-]\s\d+)*""")))
+        throw IllegalArgumentException("Invalid string format")
 
-        return firstNum + plus.sum() + minus.sum()
-    } else throw IllegalArgumentException()
+    val plus = Regex("""\+\s\d+""").findAll(expression).map {
+        it.groupValues[0].replace("+ ", "").toInt()
+    }
+    val minus = Regex("""-\s\d+""").findAll(expression).map {
+        it.groupValues[0].replace("- ", "").toInt() * -1
+    }
+    val firstNum = Regex("""^\d+""").find(expression)!!.value.toInt()
+
+    return firstNum + plus.sum() + minus.sum()
 }
 
 /**
@@ -218,8 +204,8 @@ fun plusMinus(expression: String): Int {
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int =
-    Regex("""([\wа-я]+)\s\1""", RegexOption.IGNORE_CASE).find(str)?.range?.start ?: -1
+fun firstDuplicateIndex(str: String): Int = TODO()
+//  Regex("""([\wа-я]+)\s\1""", RegexOption.IGNORE_CASE).find(str)?.range?.start ?: -1
 
 /**
  * Сложная (6 баллов)
@@ -233,22 +219,22 @@ fun firstDuplicateIndex(str: String): Int =
  * Все цены должны быть больше нуля либо равны нулю.
  */
 fun mostExpensive(description: String): String {
-    return if (description.matches(Regex("""(?:[\wа-яА-Я]+\s\d+(?:\.\d+)*;\s)*[\wа-яА-Я]+\s\d+(?:\.\d+)*"""))) {
-        var max = 0.0
-        var result = ""
-        val list = description.split("; ")
+    var max = 0.0
+    var result = ""
+    val list = description.split("; ")
 
-        for (stuff in list) {
-            val goods = stuff.split(" ")
-            val price = goods[1].toDouble()
+    for (stuff in list) {
+        if (!stuff.matches(Regex("""[\wа-яА-Я]+\s\d+(\.\d+)*"""))) return ""
 
-            if (price > max) {
-                max = price
-                result = goods[0]
-            }
+        val goods = stuff.split(" ")
+        val price = goods[1].toDouble()
+
+        if (price > max) {
+            max = price
+            result = goods[0]
         }
-        if (max == 0.0) list[0].split(" ")[0] else result
-    } else ""
+    }
+    return if (max == 0.0) list[0].split(" ")[0] else result
 }
 
 /**

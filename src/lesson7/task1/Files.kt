@@ -64,9 +64,11 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  */
 fun deleteMarked(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
+
     File(inputName).bufferedReader().forEachLine {
         if (it == "") writer.write(it + "\n") else {
-            if (it[0].toString() != "_") {
+
+            if (!it.startsWith("_")) {
                 writer.write(it + "\n")
             }
         }
@@ -91,14 +93,19 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
 
         for (string in substrings) {
             val str = string.toLowerCase()
-            val size = text.windowed(str.length).count { x: String -> x == str }
 
-            result[string] = size
+            var k = 0
+            var index = text.indexOf(str)
+            while (index != -1) {
+                k++
+                index = text.indexOf(str, startIndex = index + 1)
+            }
+
+            result[string] = k
         }
     }
     return result
 }
-
 
 /**
  * Средняя (12 баллов)
@@ -120,16 +127,15 @@ fun sibilants(inputName: String, outputName: String) {
         for (string in File(inputName).bufferedReader().readLines()) {
             val errors = Regex("""[жчшщ][ыяю]""", RegexOption.IGNORE_CASE).findAll(string)
 
-            if (errors.count() != 0) {
-                var str = string
-                for (value in errors) {
-                    val i = value.range.last
-                    val j = string[i].toString()
-                    str = str.replaceRange(i..i, vowels[j]!!)
 
-                }
-                it.write(str + "\n")
-            } else it.write(string + "\n")
+            var str = string
+            for (value in errors) {
+                val i = value.range.last
+                val j = string[i].toString()
+                str = str.replaceRange(i..i, vowels[j]!!)
+
+            }
+            it.write(str + "\n")
         }
     }
 }
@@ -202,31 +208,37 @@ fun alignFileByWidth(inputName: String, outputName: String) {
         }.maxOrNull() ?: 0
 
         for (string in readFile) {
-            val str = Regex("""\s+""").split(string).filter { x: String -> x != "" }
+            val str = Regex("""\s+""").split(string).filter { x -> x != "" }
 
-            if (str.size <= 1) it.write(str.joinToString() + "\n") else {
-                if (l - str.joinToString(separator = "").length == 0)
-                    it.write(str.joinToString(separator = " ") + "\n") else {
-
-                    val space = l - str.joinToString(separator = "").length
-                    var mod = space % (str.size - 1)
-                    val r = space / (str.size - 1)
-                    var result = ""
-
-                    for (i in 0..str.size - 2) {
-                        if (mod > 0) {
-                            result += str[i] + " ".repeat(r + 1)
-                            mod -= 1
-                        } else result += str[i] + " ".repeat(r)
-                    }
-                    result += str[str.size - 1]
-
-                    it.write(result + "\n")
-                }
+            if (str.size <= 1) {
+                it.write(str.joinToString() + "\n")
+                continue
             }
+            if (l - str.joinToString(separator = "").length == 0) {
+                it.write(str.joinToString(separator = " ") + "\n")
+                continue
+            }
+
+            val space = l - str.joinToString(separator = "").length
+            var mod = space % (str.size - 1)
+            val r = space / (str.size - 1)
+
+            val result = buildString {
+
+                for (i in 0..str.size - 2) {
+                    if (mod > 0) {
+                        this.append(str[i] + " ".repeat(r + 1))
+                        mod -= 1
+                    } else this.append(str[i] + " ".repeat(r))
+                }
+                this.append(str[str.size - 1])
+            }
+
+            it.write(result + "\n")
         }
     }
 }
+
 
 /**
  * Средняя (14 баллов)
@@ -289,25 +301,18 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
     File(outputName).bufferedWriter().use {
         val readFile = File(inputName).reader()
 
-        fun caseSwitch(str: String): String {
-            val x = str.toLowerCase().toMutableList()
-            x[0] = x[0].toUpperCase()
-            return x.joinToString(separator = "")
-        }
-
         for (i in 1..File(inputName).length()) {
             val ch = readFile.read()
             val char = ch.toChar()
-            val symbol = if (dictionary.containsKey(char.toLowerCase())) dictionary[char.toLowerCase()] else
-                dictionary[char.toUpperCase()]
+            val symbol = dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()]
 
-            if (ch != -1) {
-                if (symbol != null) {
-                    if (char.isUpperCase() && symbol != "") it.write(caseSwitch(symbol))
-                    else
-                        it.write(symbol.toLowerCase())
-                } else it.write(ch)
-            } else break
+            if (ch == -1) break
+            if (symbol == null) {
+                it.write(ch)
+                continue
+            }
+            if (char.isUpperCase() && symbol != "") it.write(symbol.capitalize())
+            else it.write(symbol.toLowerCase())
 
         }
     }
@@ -557,7 +562,7 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
 
 
     File(outputName).bufferedWriter().use {
-        val digits = rhv.toString().toList().map { x: Char -> x.toString().toInt() }
+        val digits = rhv.toString().map { x -> x.toString().toInt() }
         val sum = lhv * rhv
         val l = len(sum) + 1
 
@@ -598,31 +603,38 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    val resultDigits = (lhv / rhv).toString().toList().map { it.toString().toInt() }
-    val lDigits = lhv.toString().toList().map { it.toString() }
+    val resultDigits = (lhv / rhv).toString().map { it.toString().toInt() }
+    val lhvDigits = lhv.toString().map { it.toString() }
     val lhvLength = len(lhv) + 1
 
     File(outputName).bufferedWriter().use {
-        it.write(" $lhv | $rhv\n")
-
-        var flag = 0
+        var firstAction = true
         var l = len(rhv * resultDigits[0]) - 1
-        var nextNum = lhv.toString().windowed(l + 1)[0]
+        var nextNum = lhv.toString().substring(0, l + 1)
 
         for (digit in resultDigits) {
             val num = rhv * digit
             l += 1
 
-            if (flag == 0) {
-                flag = 1
-                it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + lhv / rhv + "\n")
-                it.write("-".repeat(len(num) + 1) + "\n")
+            if (firstAction) {
+                firstAction = false
 
+                if (resultDigits.size == 1 && lhvLength - 1 != len(num)) {
+                    it.write("$lhv | $rhv\n")
+                    it.write(" ".repeat(lhvLength - 2 - len(num)) + "-$num   " + lhv / rhv + "\n")
+                    it.write("-".repeat(lhvLength - 1) + "\n")
 
-                if (resultDigits.size > 1) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
-                else if (resultDigits.size == 1)
-                    it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
+                    it.write(" ".repeat(lhvLength - 1 - len(lhv % rhv)) + lhv % rhv + "\n")
+                } else {
+                    it.write(" $lhv | $rhv\n")
+                    it.write("-" + num + " ".repeat(lhvLength + 2 - len(num)) + lhv / rhv + "\n")
+                    it.write("-".repeat(len(num) + 1) + "\n")
 
+                    if (resultDigits.size == 1)
+                        it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
+                    else
+                        nextNum = (nextNum.toInt() - num).toString() + lhvDigits[l]
+                }
             } else {
                 it.write(" ".repeat(l + 1 - nextNum.length) + nextNum + "\n")
                 it.write(" ".repeat(l - len(num)) + "-" + num + "\n")
@@ -632,11 +644,16 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                 else
                     it.write(" ".repeat(l + 1 - nextNum.length) + "-".repeat(nextNum.length) + "\n")
 
-                if (l < len(lhv)) nextNum = (nextNum.toInt() - num).toString() + lDigits[l]
-                else it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
+                if (l < len(lhv)) nextNum = (nextNum.toInt() - num).toString() + lhvDigits[l]
+                else
+                    it.write(" ".repeat(lhvLength - len(lhv % rhv)) + lhv % rhv + "\n")
             }
         }
     }
 }
 
-
+fun main() {
+    println(" 742898 | 85141\n-681128   8\n-------\n  61770")
+    println()
+    println(" 12 | 9\n -9   1\n--\n 3")
+}
