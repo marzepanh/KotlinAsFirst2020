@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+//import java.util.Stack
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -391,32 +392,53 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
+fun markdown(symbol: String, tag: String, l: String): String {
+    var line = l
+    var index = line.indexOf(symbol)
+    var state = false
+
+    while (index != -1) {
+        line = if (state) line.replaceRange(index until index + symbol.length, "</$tag>")
+        else line.replaceRange(index until index + symbol.length, "<$tag>")
+        state = !state
+
+        val shift = if (state) 3 - symbol.length else 4 - symbol.length
+        index = line.indexOf(symbol, startIndex = index + symbol.length + shift)
+    }
+    return line
+}
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         it.write("<html><body>")
-        var block = ""
+        val block = StringBuilder()
         var count = 0
 
         for (l in File(inputName).readLines()) {
-            val line = l.replace(" **", "<b>").replace("**", "</b>")
-                .replace(" *", "<i>").replace("*", "</i>")
-                .replace(" ~~", "<s>").replace("~~", "</s>")
-            //replace with Regex expression
+            var line = markdown("**", "b", l)
+            line = markdown("*", "i", line)
+            line = markdown("~~", "s", line)
+
 
             if (line != "") {
-                block += line
+                block.append(line)
                 count++
-            } else {
+            } else if (block.toString() != "") {
                 it.write("<p>$block</p>")
-                block = ""
+                block.clear()
             }
+
         }
-        if (block != "" && count != 0) it.write("<p>$block</p>") else if (block != "") it.write(block)
+        if (block.toString() != "" && count != 0) it.write("<p>$block</p>")
+        else if (block.toString() != "") it.write(block.toString())
         it.write("</body></html>")
     }
 }
 
+fun main() {
+    val x = StringBuilder("rbr")
+    print(x)
+}
 
 /**
  * Сложная (23 балла)
@@ -652,8 +674,4 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 }
 
-fun main() {
-    println(" 742898 | 85141\n-681128   8\n-------\n  61770")
-    println()
-    println(" 12 | 9\n -9   1\n--\n 3")
-}
+
