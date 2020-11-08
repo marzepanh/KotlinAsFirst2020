@@ -312,7 +312,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
                 it.write(ch)
                 continue
             }
-            if (char.isUpperCase() && symbol != "") it.write(symbol.capitalize())
+            if (char.isUpperCase() && symbol != "") it.write(symbol.toLowerCase().capitalize())
             else it.write(symbol.toLowerCase())
 
         }

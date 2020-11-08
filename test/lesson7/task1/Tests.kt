@@ -12,6 +12,7 @@ class Tests {
         val content = file.readLines().joinToString("\n")
         assertEquals(expectedContent, content)
     }
+
     @Test
     @Tag("Example")
     fun alignFile() {

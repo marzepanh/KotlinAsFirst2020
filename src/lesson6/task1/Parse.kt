@@ -68,10 +68,11 @@ fun dateStrToDigit(str: String): String {
     )
     val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
+    if (date.size != 3) return ""
     val day = date[0].toIntOrNull()
     val month = months[date[1]]
     val year = date[2].toIntOrNull()
-    if (day == null || year == null || month == null || date.size != 3) return ""
+    if (day == null || year == null || month == null) return ""
 
     if (year % 4 == 0) {
         if (year % 100 != 0) days[1] += 1
@@ -99,8 +100,10 @@ fun dateDigitToStr(digital: String): String {
     )
     val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
+    if (date.size != 3) return ""
     val num = date[1].toIntOrNull()
-    if (date.size != 3 || num !in 1..12) return ""
+
+    if (num !in 1..12) return ""
 
     val day = date[0].toIntOrNull()
     val month = months[num!! - 1]
