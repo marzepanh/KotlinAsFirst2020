@@ -3,7 +3,6 @@
 package lesson7.task1
 
 import java.io.File
-//import java.util.Stack
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -433,11 +432,6 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         else if (block.toString() != "") it.write(block.toString())
         it.write("</body></html>")
     }
-}
-
-fun main() {
-    val x = StringBuilder("rbr")
-    print(x)
 }
 
 /**
