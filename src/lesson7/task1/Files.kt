@@ -89,7 +89,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     val result = mutableMapOf<String, Int>()
 
     File(inputName).bufferedReader().use {
-        val text = it.readLines().toString().toLowerCase()
+        val text = it.readLines().joinToString(separator = "").toLowerCase()
 
         for (string in substrings) {
             val str = string.toLowerCase()
@@ -106,6 +106,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
     }
     return result
 }
+
 
 /**
  * Средняя (12 баллов)
@@ -227,11 +228,12 @@ fun alignFileByWidth(inputName: String, outputName: String) {
 
                 for (i in 0..str.size - 2) {
                     if (mod > 0) {
-                        this.append(str[i] + " ".repeat(r + 1))
+                        append(str[i] + " ".repeat(r + 1))
                         mod -= 1
-                    } else this.append(str[i] + " ".repeat(r))
+
+                    } else append(str[i] + " ".repeat(r))
                 }
-                this.append(str[str.size - 1])
+                append(str[str.size - 1])
             }
 
             it.write(result + "\n")
@@ -301,12 +303,14 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
     File(outputName).bufferedWriter().use {
         val readFile = File(inputName).reader()
 
-        for (i in 1..File(inputName).length()) {
+        while (true) {
             val ch = readFile.read()
+            if (ch == -1) break
+
             val char = ch.toChar()
             val symbol = dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()]
 
-            if (ch == -1) break
+
             if (symbol == null) {
                 it.write(ch)
                 continue

@@ -60,24 +60,28 @@ fun timeSecondsToStr(seconds: Int): String {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
+fun leapYear(year: Int): List<Int> {
+    val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+
+    if (year % 4 == 0) {
+        if (year % 100 != 0) days[1] += 1
+        else if (year % 400 == 0) days[1] += 1
+    }
+    return days
+}
+
 fun dateStrToDigit(str: String): String {
     val date = str.split(" ")
     val months = mapOf(
         "января" to 1, "февраля" to 2, "марта" to 3, "апреля" to 4, "мая" to 5, "июня" to 6, "июля" to 7,
         "августа" to 8, "сентября" to 9, "октября" to 10, "ноября" to 11, "декабря" to 12
     )
-    val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-
     if (date.size != 3) return ""
     val day = date[0].toIntOrNull()
     val month = months[date[1]]
     val year = date[2].toIntOrNull()
     if (day == null || year == null || month == null) return ""
-
-    if (year % 4 == 0) {
-        if (year % 100 != 0) days[1] += 1
-        else if (year % 400 == 0) days[1] += 1
-    }
+    val days = leapYear(year)
 
     return if (day <= days[month - 1]) String.format("%02d.%02d.%d", day, month, year) else ""
 }
@@ -98,26 +102,21 @@ fun dateDigitToStr(digital: String): String {
         "января", "февраля", "марта", "апреля", "мая", "июня", "июля",
         "августа", "сентября", "октября", "ноября", "декабря"
     )
-    val days = mutableListOf(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
 
     if (date.size != 3) return ""
-    val num = date[1].toIntOrNull()
+    val num = date[1].toIntOrNull() ?: return ""
 
     if (num !in 1..12) return ""
 
     val day = date[0].toIntOrNull()
-    val month = months[num!! - 1]
+    val month = months[num - 1]
     val year = date[2].toIntOrNull()
     if (day == null || year == null) return ""
 
-    if (year % 4 == 0) {
-        if (year % 100 != 0) days[1] += 1
-        else if (year % 400 == 0) days[1] += 1
-    }
+    val days = leapYear(year)
 
     return if (day <= days[num - 1]) "$day $month $year" else ""
 }
-
 
 /**
  * Средняя (4 балла)
@@ -152,7 +151,6 @@ fun flattenPhoneNumber(phone: String): String = if (phone.contains(Regex("""[^-+
 fun bestLongJump(jumps: String): Int = jumps.split(" ", "-", "%").filter { it != "" }.map {
     if (it.toIntOrNull() == null) return -1 else it.toInt()
 }.maxOrNull() ?: -1
-
 
 /**
  * Сложная (6 баллов)
@@ -224,14 +222,13 @@ fun firstDuplicateIndex(str: String): Int = TODO()
 fun mostExpensive(description: String): String {
     var max = 0.0
     var result = ""
-    val list = description.split("; ")
+    val list = description.split(";\\s+".toRegex())
 
     for (stuff in list) {
-        if (!stuff.matches(Regex("""[\wа-яА-Я]+\s\d+(\.\d+)*"""))) return ""
-
         val goods = stuff.split(" ")
-        val price = goods[1].toDouble()
+        if (goods.size != 2) return ""
 
+        val price = goods[1].toDoubleOrNull() ?: return ""
         if (price > max) {
             max = price
             result = goods[0]
