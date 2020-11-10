@@ -105,16 +105,13 @@ fun dateDigitToStr(digital: String): String {
 
     if (date.size != 3) return ""
     val num = date[1].toIntOrNull() ?: return ""
-
-    if (num !in 1..12) return ""
+    if (num - 1 !in months.indices) return ""
 
     val day = date[0].toIntOrNull()
     val month = months[num - 1]
     val year = date[2].toIntOrNull()
     if (day == null || year == null) return ""
-
     val days = leapYear(year)
-
     return if (day <= days[num - 1]) "$day $month $year" else ""
 }
 
@@ -136,7 +133,6 @@ fun dateDigitToStr(digital: String): String {
 fun flattenPhoneNumber(phone: String): String = if (phone.contains(Regex("""[^-+()\s0-9]|\(\s*\)|\d\++""")))
     "" else phone.replace("""\s+|-|\(|\)""".toRegex(), "")
 
-
 /**
  * Средняя (5 баллов)
  *
@@ -148,7 +144,7 @@ fun flattenPhoneNumber(phone: String): String = if (phone.contains(Regex("""[^-+
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 
-fun bestLongJump(jumps: String): Int = jumps.split(" ", "-", "%").filter { it != "" }.map {
+fun bestLongJump(jumps: String): Int = jumps.split(" ", "-", "%").filter { it.isNotEmpty() }.map {
     if (it.toIntOrNull() == null) return -1 else it.toInt()
 }.maxOrNull() ?: -1
 
@@ -164,11 +160,10 @@ fun bestLongJump(jumps: String): Int = jumps.split(" ", "-", "%").filter { it !=
  * вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    val string = jumps.split(" ", "-", "%").filter { it != "" }.joinToString(separator = " ")
+    val string = jumps.split(" ", "-", "%").filter { it.isNotEmpty() }.joinToString(separator = " ")
     val result = Regex("""\d+\s\+""").findAll(string).map {
         it.groupValues[0].replace(" +", "").toInt()
     }
-
     return result.maxOrNull() ?: -1
 }
 
@@ -184,7 +179,6 @@ fun bestHighJump(jumps: String): Int {
 fun plusMinus(expression: String): Int {
     if (!expression.matches(Regex("""^\d+(?:\s[+-]\s\d+)*""")))
         throw IllegalArgumentException("Invalid string format")
-
     val plus = Regex("""\+\s\d+""").findAll(expression).map {
         it.groupValues[0].replace("+ ", "").toInt()
     }
@@ -192,7 +186,6 @@ fun plusMinus(expression: String): Int {
         it.groupValues[0].replace("- ", "").toInt() * -1
     }
     val firstNum = Regex("""^\d+""").find(expression)!!.value.toInt()
-
     return firstNum + plus.sum() + minus.sum()
 }
 
@@ -219,22 +212,24 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
+
 fun mostExpensive(description: String): String {
-    var max = 0.0
-    var result = ""
+    var max = -1.0
     val list = description.split(";\\s+".toRegex())
 
-    for (stuff in list) {
-        val goods = stuff.split(" ")
-        if (goods.size != 2) return ""
-
-        val price = goods[1].toDoubleOrNull() ?: return ""
-        if (price > max) {
-            max = price
-            result = goods[0]
+    return buildString {
+        for (stuff in list) {
+            val goods = stuff.split(" ")
+            if (goods.size != 2) return ""
+            val price = goods[1].toDoubleOrNull()
+            if (price == null || price < 0.0) return ""
+            if (price > max) {
+                max = price
+                clear()
+                append(goods[0])
+            }
         }
     }
-    return if (max == 0.0) list[0].split(" ")[0] else result
 }
 
 /**

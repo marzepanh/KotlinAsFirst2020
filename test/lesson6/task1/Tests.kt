@@ -128,7 +128,6 @@ class Tests {
         assertEquals("Вино", mostExpensive("Вино 255.0"))
         assertEquals("a", mostExpensive("a 0"))
         assertEquals("a", mostExpensive("a 0"))
-
     }
 
     @Test
