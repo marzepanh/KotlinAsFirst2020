@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -372,42 +373,46 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdown(symbol: String, tag: String, l: String): String {
+fun markdown(symbol: String, tag: String, l: String, tagState: Boolean): List<String> {
     var line = l
     var index = line.indexOf(symbol)
-    var state = false
+    var state = tagState
 
     while (index != -1) {
         line = if (state) line.replaceRange(index until index + symbol.length, "</$tag>")
         else line.replaceRange(index until index + symbol.length, "<$tag>")
+        val htmlTag = if (state) "</$tag>" else "<$tag>"
         state = !state
-        val tagLength = if (state) 3 else 4
-        val shift = tagLength - symbol.length
+        val shift = htmlTag.length - symbol.length
         index = line.indexOf(symbol, startIndex = index + symbol.length + shift)
     }
-    return line
+    val st = if (state) "1" else "0"
+    return listOf(line, st)
 }
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         it.write("<html><body>")
         val block = StringBuilder()
-        var count = 0
-
+        //var count = 0
+        var i = false
+        var b = false
+        var s = false
         for (l in File(inputName).readLines()) {
-            var line = markdown("**", "b", l)
-            line = markdown("*", "i", line)
-            line = markdown("~~", "s", line)
-            if (line != "") {
-                block.append(line)
-                count++
-            } else if (block.toString() != "") {
+            var line = markdown("**", "b", l, b)
+            b = line[1] == "1"
+            line = markdown("*", "i", line[0], i)
+            i = line[1] == "1"
+            line = markdown("~~", "s", line[0], s)
+            s = line[1] == "1"
+
+            if (line[0].isNotEmpty()) block.append(line[0])
+            else if (block.toString().isNotEmpty()) {
                 it.write("<p>$block</p>")
                 block.clear()
             }
         }
-        if (block.toString() != "" && count != 0) it.write("<p>$block</p>")
-        else if (block.toString() != "") it.write(block.toString())
+        if (block.toString().isNotEmpty()) it.write("<p>$block</p>")
         it.write("</body></html>")
     }
 }
@@ -465,52 +470,81 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  *
  * Соответствующий выходной файл:
-///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-<html>
-<body>
-<p>
-<ul>
-<li>
-Утка по-пекински
-<ul>
-<li>Утка</li>
-<li>Соус</li>
-</ul>
-</li>
-<li>
-Салат Оливье
-<ol>
-<li>Мясо
-<ul>
-<li>Или колбаса</li>
-</ul>
-</li>
-<li>Майонез</li>
-<li>Картофель</li>
-<li>Что-то там ещё</li>
-</ol>
-</li>
-<li>Помидоры</li>
-<li>Фрукты
-<ol>
-<li>Бананы</li>
-<li>Яблоки
-<ol>
-<li>Красные</li>
-<li>Зелёные</li>
-</ol>
-</li>
-</ol>
-</li>
-</ul>
-</p>
-</body>
-</html>
+///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////<html>
+//  <body>
+//    <p>
+//      <ul>
+//        <li>
+//          Утка по-пекински
+//          <ul>
+//            <li>Утка</li>
+//            <li>Соус</li>
+//          </ul>
+//        </li>
+//        <li>
+//          Салат Оливье
+//          <ol>
+//            <li>Мясо
+//              <ul>
+//                <li>Или колбаса</li>
+//              </ul>
+//            </li>
+//            <li>Майонез</li>
+//            <li>Картофель</li>
+//            <li>Что-то там ещё</li>
+//          </ol>
+//        </li>
+//        <li>Помидоры</li>
+//        <li>Фрукты
+//          <ol>
+//            <li>Бананы</li>
+//            <li>Яблоки
+//              <ol>
+//                <li>Красные</li>
+//                <li>Зелёные</li>
+//              </ol>
+//            </li>
+//          </ol>
+//        </li>
+//      </ul>
+//    </p>
+//  </body>
+//</html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val stack = Stack<String>()
+    var openTag = false
+    File(outputName).bufferedWriter().use {
+        it.write("<html><body><p>")
+        for (line in File(inputName).readLines()) {
+            val separated = line.split(Regex("""\*|\d+\."""))
+            val delimiter = Regex("""\*|\d+\.""").find(line)!!.value
+            val indentLength = separated[0].length / 4
+            val tag = if (delimiter == "*") "ul" else "ol"
+            if (!openTag) {
+                it.write("<$tag>" + "<li>" + separated[1])
+                stack.push(tag)
+                openTag = true
+            } else {
+                val stackSize = stack.size - 1
+                if (indentLength == stackSize) it.write("</li>" + "<li>" + separated[1])
+                if (indentLength == stackSize + 1) {
+                    stack.push(tag)
+                    it.write("<$tag>" + "<li>" + separated[1])
+                }
+                if (indentLength == stackSize - 1) {
+                    it.write("</li>" + "</" + stack.pop() + ">" + "</li>")
+                    it.write("<li>" + separated[1])
+                }
+            }
+        }
+        while (stack.size != 0) {
+            it.write("</li>" + "</" + stack.pop() + ">")
+        }
+        it.write("</p></body></html>")
+    }
 }
 
 /**
@@ -522,8 +556,9 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
  *
  */
 fun markdownToHtml(inputName: String, outputName: String) {
-    TODO()
+TODO()
 }
+
 
 /**
  * Средняя (12 баллов)
