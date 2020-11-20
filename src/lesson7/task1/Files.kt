@@ -396,7 +396,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var i = false
         var b = false
         var s = false
-        var prevLineIsEmpty = false
+        var prevLine = false
         for (l in File(inputName).readLines()) {
             var line = markdown("**", "b", l, b)
             b = line.second
@@ -407,11 +407,11 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             
             if (line.first.isNotEmpty()) {
                 block.append(line.first)
-                prevLineIsEmpty = false 
-            } else if (!prevLineIsEmpty) {
+                prevLine = false 
+            } else if (!prevLine) {
                 it.write("<p>$block</p>")
                 block.clear()
-                prevLineIsEmpty = true
+                prevLine = true
             }
         }
         if (block.toString().isNotEmpty()) it.write("<p>$block</p>")
