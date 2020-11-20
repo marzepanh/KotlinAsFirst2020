@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             line = markdown("~~", "s", line.first, s)
             s = line.second
 
-            if (line.first.trim().isNotEmpty()) block.append(line.first) else {
+            if (line.first.isNotEmpty()) block.append(line.first) else {
                 it.write("<p>$block</p>")
                 block.clear()
             }
