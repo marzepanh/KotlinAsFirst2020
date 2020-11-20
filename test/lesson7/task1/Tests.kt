@@ -267,11 +267,14 @@ Basic, Ruby, Swift.
         File("temp.html").delete()
     }
 
+
     @Test
     @Tag("22")
     fun markdownToHtmlSimple() {
         markdownToHtmlSimple("input/markdown_simple.md", "temp.html")
         checkHtmlSimpleExample()
+
+        //markdownToHtmlSimple("input/md_simple.md", "temp.html")
     }
 
     private fun checkHtmlListsExample() {

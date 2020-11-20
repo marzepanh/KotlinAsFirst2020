@@ -373,21 +373,19 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdown(symbol: String, tag: String, l: String, tagState: Boolean): List<String> {
+fun markdown(symbol: String, tag: String, l: String, tagState: Boolean): Pair<String, Boolean> {
     var line = l
     var index = line.indexOf(symbol)
     var state = tagState
 
     while (index != -1) {
-        line = if (state) line.replaceRange(index until index + symbol.length, "</$tag>")
-        else line.replaceRange(index until index + symbol.length, "<$tag>")
         val htmlTag = if (state) "</$tag>" else "<$tag>"
+        line = line.replaceRange(index until index + symbol.length, htmlTag)
         state = !state
         val shift = htmlTag.length - symbol.length
         index = line.indexOf(symbol, startIndex = index + symbol.length + shift)
     }
-    val st = if (state) "1" else "0"
-    return listOf(line, st)
+    return Pair(line, state)
 }
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
@@ -400,14 +398,13 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var s = false
         for (l in File(inputName).readLines()) {
             var line = markdown("**", "b", l, b)
-            b = line[1] == "1"
-            line = markdown("*", "i", line[0], i)
-            i = line[1] == "1"
-            line = markdown("~~", "s", line[0], s)
-            s = line[1] == "1"
+            b = line.second
+            line = markdown("*", "i", line.first, i)
+            i = line.second
+            line = markdown("~~", "s", line.first, s)
+            s = line.second
 
-            if (line[0].isNotEmpty()) block.append(line[0])
-            else if (block.toString().isNotEmpty()) {
+            if (line.first.trim().isNotEmpty()) block.append(line.first) else {
                 it.write("<p>$block</p>")
                 block.clear()
             }
@@ -558,7 +555,6 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
 fun markdownToHtml(inputName: String, outputName: String) {
 TODO()
 }
-
 
 /**
  * Средняя (12 баллов)
