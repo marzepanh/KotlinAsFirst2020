@@ -405,7 +405,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
             line = markdown("~~", "s", line.first, s)
             s = line.second
             
-            if (line.first.isNotEmpty()) {
+            if (line.first.trim().isNotEmpty()) {
                 block.append(line.first)
                 prevLine = false 
             } else if (!prevLine) {
