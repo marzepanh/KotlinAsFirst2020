@@ -397,7 +397,8 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
         var b = false
         var s = false
         var prevLine = false
-        for (l in File(inputName).readLines()) {
+        val text = File(inputName).readText().trim()
+        for (l in text.split("\n")) {
             var line = markdown("**", "b", l, b)
             b = line.second
             line = markdown("*", "i", line.first, i)
