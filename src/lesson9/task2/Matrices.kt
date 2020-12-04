@@ -4,6 +4,8 @@ package lesson9.task2
 
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
+import lesson9.task1.Cell
+//import lesson8.task3.Graph
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -46,6 +48,11 @@ operator fun Matrix<Int>.plus(other: Matrix<Int>): Matrix<Int> {
         }
     }
     return result
+}
+
+fun main() {
+    val matrix = createMatrix(5, 5, 0)
+    println(matrix)
 }
 
 /**
@@ -216,7 +223,28 @@ operator fun Matrix<Int>.times(other: Matrix<Int>): Matrix<Int> = TODO(this.toSt
  * Вернуть тройку (Triple) -- (да/нет, требуемый сдвиг по высоте, требуемый сдвиг по ширине).
  * Если наложение невозможно, то первый элемент тройки "нет" и сдвиги могут быть любыми.
  */
-fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> = TODO()
+fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> {
+    val widthShift = lock.width - key.width
+    val heightShift = lock.height - key.height
+    var breakFlag = false
+    for (h in 0..heightShift) {
+        for (w in 0..widthShift) {
+
+            loop@ for (i in 0 until key.height) {
+                for (j in 0 until key.width) {
+                    if (lock[i + h, j + w] + key[i, j] != 1) {
+                        breakFlag = true
+                        break@loop
+                    }
+                }
+            }
+            if (!breakFlag) return Triple(true, h, w)
+            breakFlag = false
+        }
+    }
+    return Triple(false, -1, -1)
+}
+
 
 /**
  * Сложная (8 баллов)
@@ -245,7 +273,36 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+fun emptyCell(matrix: Matrix<Int>): Cell {
+    for (i in 0 until matrix.height) {
+        for (j in 0 until matrix.width) {
+            if (matrix[i, j] == 0) return Cell(i, j)
+        }
+    }
+    throw IllegalStateException("Illegal numbers")
+}
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    var emptyCell = emptyCell(matrix)
+    for (move in moves) {
+        val newCell = when {
+            emptyCell.row + 1 < matrix.height && matrix[emptyCell.row + 1, emptyCell.column] == move
+            -> Cell(emptyCell.row + 1, emptyCell.column)
+            emptyCell.row - 1 >= 0 && matrix[emptyCell.row - 1, emptyCell.column] == move
+            -> Cell(emptyCell.row - 1, emptyCell.column)
+            emptyCell.column + 1 < matrix.width && matrix[emptyCell.row, emptyCell.column + 1] == move
+            -> Cell(emptyCell.row, emptyCell.column + 1)
+            emptyCell.column - 1 >= 0 && matrix[emptyCell.row, emptyCell.column - 1] == move
+            -> Cell(emptyCell.row, emptyCell.column - 1)
+            else -> emptyCell
+        }
+        if (newCell == emptyCell) throw IllegalStateException("Illegal move: $move")
+        matrix[newCell.row, newCell.column] = 0
+        matrix[emptyCell.row, emptyCell.column] = move
+        emptyCell = newCell
+    }
+    return matrix
+}
 
 /**
  * Очень сложная (32 балла)
@@ -286,4 +343,5 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO(
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
+
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO()
