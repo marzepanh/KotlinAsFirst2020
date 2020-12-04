@@ -8,7 +8,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.atan
-import kotlin.Double as Double1
 
 // Урок 8: простые классы
 // Максимальное количество баллов = 40 (без очень трудных задач = 11)
@@ -16,13 +15,13 @@ import kotlin.Double as Double1
 /**
  * Точка на плоскости
  */
-data class Point(val x: Double1, val y: Double1) {
+data class Point(val x: Double, val y: Double) {
     /**
      * Пример
      *
      * Рассчитать (по известной формуле) расстояние между двумя точками
      */
-    fun distance(other: Point): Double1 = sqrt(sqr(x - other.x) + sqr(y - other.y))
+    fun distance(other: Point): Double = sqrt(sqr(x - other.x) + sqr(y - other.y))
 }
 
 /**
@@ -50,7 +49,7 @@ class Triangle private constructor(private val points: Set<Point>) {
     /**
      * Пример: площадь
      */
-    fun area(): Double1 {
+    fun area(): Double {
         val p = halfPerimeter()
         return sqrt(p * (p - a.distance(b)) * (p - b.distance(c)) * (p - c.distance(a)))
     }
@@ -77,7 +76,7 @@ class Triangle private constructor(private val points: Set<Point>) {
  */
 fun distance(p1: Point, p2: Point) = sqrt(sqr(p2.x - p1.x) + sqr(p2.y - p1.y))
 
-data class Circle(val center: Point, val radius: Double1) {
+data class Circle(val center: Point, val radius: Double) {
     /**
      * Простая (2 балла)
      *
@@ -87,7 +86,7 @@ data class Circle(val center: Point, val radius: Double1) {
      * Расстояние между пересекающимися окружностями считать равным 0.0.
      */
 
-    fun distance(other: Circle): Double1 {
+    fun distance(other: Circle): Double {
         val r = distance(center, other.center) - (radius + other.radius)
         return if (r > 0) r else 0.0
     }
@@ -155,12 +154,12 @@ fun circleByDiameter(diameter: Segment): Circle =
  * или: y * cos(angle) = x * sin(angle) + b, где b = point.y * cos(angle) - point.x * sin(angle).
  * Угол наклона обязан находиться в диапазоне от 0 (включительно) до PI (исключительно).
  */
-class Line private constructor(val b: Double1, val angle: Double1) {
+class Line private constructor(val b: Double, val angle: Double) {
     init {
         require(angle >= 0 && angle < PI) { "Incorrect line angle: $angle" }
     }
 
-    constructor(point: Point, angle: Double1) : this(point.y * cos(angle) - point.x * sin(angle), angle)
+    constructor(point: Point, angle: Double) : this(point.y * cos(angle) - point.x * sin(angle), angle)
 
     /**
      * Средняя (3 балла)
@@ -198,10 +197,11 @@ fun lineBySegment(s: Segment): Line {
     val angle = if (s.begin.x == s.end.x) PI / 2 else {
         val k = (s.begin.y - s.end.y) / (s.begin.x - s.end.x)
         val arctgK = atan(k)
-        if (arctgK > 0) arctgK else PI + arctgK
+        if (arctgK >= 0.0) arctgK else PI + arctgK
     }
     return Line(s.begin, angle)
 }
+
 
 /**
  * Средняя (3 балла)

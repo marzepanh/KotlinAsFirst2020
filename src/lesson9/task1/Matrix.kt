@@ -60,8 +60,8 @@ class MatrixImpl<E>(
     private val map = mutableMapOf<Cell, E>()
 
     init {
-        for (i in 0 until width) {
-            for (j in 0 until height) {
+        for (i in 0 until height) {
+            for (j in 0 until width) {
                 map[Cell(i, j)] = e
             }
         }
