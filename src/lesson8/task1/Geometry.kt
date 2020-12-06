@@ -8,6 +8,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.atan
+import kotlin.math.abs
 
 // Урок 8: простые классы
 // Максимальное количество баллов = 40 (без очень трудных задач = 11)
@@ -96,7 +97,8 @@ data class Circle(val center: Point, val radius: Double) {
      *
      * Вернуть true, если и только если окружность содержит данную точку НА себе или ВНУТРИ себя
      */
-    fun contains(p: Point): Boolean = distance(p, center) <= radius
+    fun contains(p: Point): Boolean = distance(p, center) < radius
+            || abs(distance(p, center) - radius) <= 1e-5
 }
 
 /**
@@ -197,7 +199,11 @@ fun lineBySegment(s: Segment): Line {
     val angle = if (s.begin.x == s.end.x) PI / 2 else {
         val k = (s.begin.y - s.end.y) / (s.begin.x - s.end.x)
         val arctgK = atan(k)
-        if (arctgK >= 0.0) arctgK else PI + arctgK
+        when {
+            abs(arctgK - 0.0) <= 1e-5 -> 0.0
+            arctgK >= 0.0 -> arctgK
+            else -> PI + arctgK
+        }
     }
     return Line(s.begin, angle)
 }
@@ -276,7 +282,7 @@ fun minContainingCircle(vararg points: Point): Circle {
             farthestPoint = point
         }
     }
-    return if (maxDistance <= radius) Circle(center, radius)
+    return if (maxDistance < radius || abs(maxDistance - radius) <= 1e-5) Circle(center, radius)
     else circleByThreePoints(diameter.begin, diameter.end, farthestPoint)
 }
 
